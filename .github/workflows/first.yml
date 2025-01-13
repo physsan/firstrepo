@@ -1,45 +1,22 @@
-name: Print GITHUB_EVENT_PATH Content
+name: Print GitHub Context
 
 on:
-#  push:
-#    branches:
-#      - main
+  push:
+    branches:
+      - main
   pull_request:
+    branches:
+      - main
 
 jobs:
-  print-event-path:
+  print-context:
     runs-on: ubuntu-latest
 
     steps:
-      - name: Checkout Code
+      - name: Checkout code
         uses: actions/checkout@v3
 
-      - name: Print GITHUB_EVENT_PATH Content
+      - name: Print GitHub context
         run: |
-          echo "Content of GITHUB_EVENT_PATH:"
-          cat $GITHUB_EVENT_PATH
-      - name: Call GitHub API to check mergeability
-        env:
-
-          GITHUB_TOKEN: ${{ secrets.GH_TOKEN }}
-        run: |
-          # Get pull request details using GitHub API
-          PR_NUMBER=$(echo "${{ github.event.pull_request.number }}")
-          API_URL="https://api.github.com/repos/${{ github.repository }}/pulls/$PR_NUMBER"
-
-          # Fetch mergeable state
-          RESPONSE=$(curl -s -H "Authorization: Bearer $GITHUB_TOKEN" "$API_URL")
-          MERGEABLE=$(echo "$RESPONSE" | jq -r '.mergeable')
-
-          echo "Mergeable status: $MERGEABLE"
-
-          # Check if the branch is behind
-          if [[ "$MERGEABLE" == "false" ]]; then
-            echo "Branch is behind main. Please update it."
-            exit 1
-          elif [[ "$MERGEABLE" == "null" ]]; then
-            echo "Mergeable state is unknown. Please check manually."
-            exit 1
-          else
-            echo "Branch is up-to-date with main."
-          fi
+          echo "GitHub Context:"
+          echo "${{ toJson(github) }}"
