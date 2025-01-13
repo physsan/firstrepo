@@ -26,3 +26,11 @@ jobs:
           git config --global credential.helper 'store --file ~/.git-credentials'
         env:
           GH_TOKEN: ${{ secrets.GH_TOKEN }}
+      - name: Setup Terraform
+        uses: hashicorp/setup-terraform@v2
+        with:
+          terraform_version: 1.5.0 # Specify the version you need
+
+      # Terraform Init
+      - name: Terraform Init
+        run: terraform init
