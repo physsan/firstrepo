@@ -1,9 +1,9 @@
 name: Print GitHub Context
 
 on:
-  push:
-    branches:
-      - main
+#  push:
+#    branches:
+#      - main
   pull_request:
     branches:
       - main
@@ -16,7 +16,23 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v3
 
-      - name: Print GitHub context
+      - name: Extract base_ref and head_ref
+        id: refs
         run: |
-          echo "GitHub Context:"
-          echo "${{ toJson(github) }}"
+          echo "BASE_REF=${{ github.event.pull_request.base.ref }}" >> $GITHUB_ENV
+          echo "HEAD_REF=${{ github.event.pull_request.head.ref }}" >> $GITHUB_ENV
+          echo "REPO_NAME=${{ github.repository }}"  >> $GITHUB_ENV
+      - name: Use base_ref and head_ref in a URL
+        run: |
+          BASE_BRANCH=${{ env.BASE_REF }}
+          HEAD_BRANCH=${{ env.HEAD_REF }}
+          REPO_NAME=${{ env.REPO_NAME }}
+          API_URL="https://api.github.com/repos/$REPO_NAME/compare/$BASE_BRANCH...$HEAD_BRANCH"
+          DIVERGED_COMMIT_COUNT=$(curl --silent -H "Authorization: Bearer ${{ secrets.GH_TOKEN }}" "$API_URL" | jq ".behind_by")
+          echo "Base branch: $BASE_BRANCH"
+          echo "Head branch: $HEAD_BRANCH"
+          echo "Diverged commits: $DIVERGED_COMMIT_COUNT"
+          if [ "$DIVERGED_COMMIT_COUNT" -gt 0 ]; then
+            echo -e "\e[31mCRITICAL ERROR. Current branch is behind $DIVERGED_COMMIT_COUNT commits. Merge $BASE_BRANCH into $HEAD_BRANCH to get changes."
+            exit 1
+          fi
