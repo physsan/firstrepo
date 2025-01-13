@@ -4,7 +4,7 @@ on:
   push:
     branches:
       - main
-  pull_request:
+#  pull_request:
 
 jobs:
   print-event-path:
@@ -18,3 +18,21 @@ jobs:
         run: |
           echo "Content of GITHUB_EVENT_PATH:"
           cat $GITHUB_EVENT_PATH
+      - name: Get Diverged Commit Count
+        id: get_diverged_count
+        run: |
+          # Get the base and head branches from the GitHub event payload
+          BASE_BRANCH=$(jq -r '.pull_request.base.ref' < "$GITHUB_EVENT_PATH")
+          HEAD_BRANCH=$(jq -r '.pull_request.head.ref' < "$GITHUB_EVENT_PATH")
+          REPO_NAME=$(jq -r '.repository.full_name' < "$GITHUB_EVENT_PATH")
+          # Use the GitHub API to get the comparison between the base and head branches
+          API_URL="https://api.github.com/repos/$REPO_NAME/compare/$BASE_BRANCH...$HEAD_BRANCH"
+          DIVERGED_COMMIT_COUNT=$(curl --silent -H "Authorization: Bearer ${{ secrets.GH_TOKEN }}" "$API_URL" | jq ".behind_by")
+          echo "Base branch: $BASE_BRANCH"
+          echo "Head branch: $HEAD_BRANCH"
+          echo "Diverged commits: $DIVERGED_COMMIT_COUNT"
+          if [ "$DIVERGED_COMMIT_COUNT" -gt 0 ]; then
+            echo -e "\e[31mCRITICAL ERROR. Current branch is behind $DIVERGED_COMMIT_COUNT commits. Merge $BASE_BRANCH into $HEAD_BRANCH to get changes."
+            exit 1
+          fi
+
