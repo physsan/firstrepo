@@ -20,7 +20,8 @@ jobs:
           cat $GITHUB_EVENT_PATH
       - name: Call GitHub API to check mergeability
         env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+          GITHUB_TOKEN: ${{ secrets.GH_TOKEN }}
         run: |
           # Get pull request details using GitHub API
           PR_NUMBER=$(echo "${{ github.event.pull_request.number }}")
@@ -42,4 +43,3 @@ jobs:
           else
             echo "Branch is up-to-date with main."
           fi
-
