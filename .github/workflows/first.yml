@@ -21,7 +21,6 @@ jobs:
           export ARM_SKIP_PROVIDER_REGISTRATION=true
           echo "Configuring global git credential helper to enable terraform to pull terraform modules"
           git config --global credential.helper store
-          git config --global credential.https://github.com.username gitlab-ci-token
           echo "https://${GH_TOKEN}@github.com" >>~/.git-credentials
           git config --global credential.helper 'store --file ~/.git-credentials'
         env:
