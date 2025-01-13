@@ -1,10 +1,10 @@
 name: Print GITHUB_EVENT_PATH Content
 
 on:
-  push:
-    branches:
-      - main
-#  pull_request:
+#  push:
+#    branches:
+#      - main
+  pull_request:
 
 jobs:
   print-event-path:
@@ -18,21 +18,27 @@ jobs:
         run: |
           echo "Content of GITHUB_EVENT_PATH:"
           cat $GITHUB_EVENT_PATH
-      - name: Get Diverged Commit Count
-        id: get_diverged_count
+      - name: Call GitHub API to check mergeability
+        env:
+          GITHUB_TOKEN: ${{ secrets.GH_TOKEN }}
         run: |
-          # Get the base and head branches from the GitHub event payload
-          BASE_BRANCH=$(jq -r '.pull_request.base.ref' < "$GITHUB_EVENT_PATH")
-          HEAD_BRANCH=$(jq -r '.pull_request.head.ref' < "$GITHUB_EVENT_PATH")
-          REPO_NAME=$(jq -r '.repository.full_name' < "$GITHUB_EVENT_PATH")
-          # Use the GitHub API to get the comparison between the base and head branches
-          API_URL="https://api.github.com/repos/$REPO_NAME/compare/$BASE_BRANCH...$HEAD_BRANCH"
-          DIVERGED_COMMIT_COUNT=$(curl --silent -H "Authorization: Bearer ${{ secrets.GH_TOKEN }}" "$API_URL" | jq ".behind_by")
-          echo "Base branch: $BASE_BRANCH"
-          echo "Head branch: $HEAD_BRANCH"
-          echo "Diverged commits: $DIVERGED_COMMIT_COUNT"
-          if [ "$DIVERGED_COMMIT_COUNT" -gt 0 ]; then
-            echo -e "\e[31mCRITICAL ERROR. Current branch is behind $DIVERGED_COMMIT_COUNT commits. Merge $BASE_BRANCH into $HEAD_BRANCH to get changes."
-            exit 1
-          fi
+          # Get pull request details using GitHub API
+          PR_NUMBER=$(echo "${{ github.event.pull_request.number }}")
+          API_URL="https://api.github.com/repos/${{ github.repository }}/pulls/$PR_NUMBER"
 
+          # Fetch mergeable state
+          RESPONSE=$(curl -s -H "Authorization: Bearer $GITHUB_TOKEN" "$API_URL")
+          MERGEABLE=$(echo "$RESPONSE" | jq -r '.mergeable')
+
+          echo "Mergeable status: $MERGEABLE"
+
+          # Check if the branch is behind
+          if [[ "$MERGEABLE" == "false" ]]; then
+            echo "Branch is behind main. Please update it."
+            exit 1
+          elif [[ "$MERGEABLE" == "null" ]]; then
+            echo "Mergeable state is unknown. Please check manually."
+            exit 1
+          else
+            echo "Branch is up-to-date with main."
+          fi
