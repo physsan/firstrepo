@@ -20,6 +20,7 @@ jobs:
           cat $GITHUB_EVENT_PATH
       - name: Call GitHub API to check mergeability
         env:
+
           GITHUB_TOKEN: ${{ secrets.GH_TOKEN }}
         run: |
           # Get pull request details using GitHub API
