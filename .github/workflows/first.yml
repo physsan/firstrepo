@@ -24,6 +24,21 @@ jobs:
           echo "Current branch is ${{ github.ref }}"
           echo "Current branch is ${{ github.event.pull_request.number }}"
         if: github.event.pull_request && github.event.pull_request.base.ref == 'main'     
+      - name: Get Merge Request ID
+        id: get_mr_id
+        run: |
+          # Get the base and head branches from the GitHub event payload
+          PULL_REQUEST_NUMBER=$(curl -s \
+            -H "Authorization: token $GH_TOKEN" \
+            -H "Accept: application/vnd.github.groot-preview+json" \
+            "https://api.github.com/repos/$REPO/commits/$COMMIT_SHA/pulls" | jq -r '.[0].number')
+          echo "PULL_REQUEST_NUMBER=$PULL_REQUEST_NUMBER" >> $GITHUB_ENV
+          echo "$PULL_REQUEST_NUMBER"
+          echo "Current branch is ${{ github.event.pull_request.number }}"
+        env:
+          GH_TOKEN: ${{ secrets.GH_TOKEN }}
+        if: github.event.pull_request.base.ref == 'main'
+          
       - name: Run anything 1
         run: |
           pwd
