@@ -22,7 +22,7 @@ jobs:
       - name: Check branch
         run: echo "Current branch is ${{ github.ref }}"
         if: github.event_name != 'workflow_dispatch' && github.ref == 'refs/heads/main'
-      - name: Run anything
+      - name: Run anything 1
         run: |
           pwd
           echo "My name is Hello"
