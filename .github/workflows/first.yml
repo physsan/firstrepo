@@ -7,6 +7,10 @@ on:
   pull_request:
     branches:
       - main
+  env:
+    BASE_DIR: "prod"
+    SUB_DIR:  "code"
+
 
 jobs:
   print-context:
