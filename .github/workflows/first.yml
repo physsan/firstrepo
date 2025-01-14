@@ -36,6 +36,8 @@ jobs:
             "https://api.github.com/repos/${{ github.repository }}/pulls/${{ github.event.pull_request.number }}/files" > merge_request_changes.json
             echo "Saved pull request changes to merge_request_changes.json"
             cat merge_request_changes.json
+            CHANGE_COUNT=$(jq -r "[.[] | select(.filename | startswith(\"infra/${BASE_DIR}/$SUB_DIR/\"))] | length" merge_request_changes.json)
+            echo "$CHANGE_COUNT"
         if: github.event.pull_request && github.event.pull_request.base.ref == 'main'
         env:
           GH_TOKEN: ${{ secrets.GH_TOKEN }}
