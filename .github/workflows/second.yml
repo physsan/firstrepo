@@ -1,0 +1,11 @@
+name: Print Workflow ID
+
+on:
+  workflow_dispatch:
+
+jobs:
+  print_id:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Print Workflow ID
+        run: echo "Workflow ID: ${{ github.run_id }}"
