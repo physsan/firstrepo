@@ -10,3 +10,9 @@ jobs:
       - name: Print Workflow ID
         run: echo  ${{ github.run_id }}
     
+  print_id2:
+    runs-on: ubuntu-latest
+    environment: staging
+    steps:
+      - name: Print Workflow ID
+        run: echo  ${{ github.run_id }}
