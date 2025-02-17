@@ -16,4 +16,4 @@ jobs:
     steps:
       - name: Print Workflow ID
         run: echo  ${{ github.run_id }}
-        if: ${{ github.event_name == 'workflow_dispatch' }}
+    
