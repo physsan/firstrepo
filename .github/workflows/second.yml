@@ -14,7 +14,9 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Print Workflow ID
-        run: echo  ${{ github.run_id }}
+        run: |
+          echo  ${{ github.run_id }}
+          echo "FULL=$BASE_DIR.$SUB_DIR.$RUN_ID.$RUN_ID" >> $GITHUB_ENV
     
   print_id2:
     runs-on: ubuntu-latest
@@ -28,5 +30,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Print Workflow ID
-        run: echo  $FULL
+        run: |
+          echo  ${{ env.FULL }}
+          echo $FULL
     
