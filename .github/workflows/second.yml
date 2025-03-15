@@ -2,7 +2,11 @@ name: Print Workflow ID
 
 on:
   workflow_dispatch:
-
+env:
+  BASE_DIR: "prod"
+  SUB_DIR:  "code"
+  COMBINE: $BASE_DIR.$SUB_DIR
+  
 jobs:
   print_id:
     runs-on: ubuntu-latest
@@ -16,4 +20,9 @@ jobs:
     steps:
       - name: Print Workflow ID
         run: echo  ${{ github.run_id }}
+  print_id3:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Print Workflow ID
+        run: echo  "$COMBINE"
     
