@@ -24,7 +24,7 @@ jobs:
     needs: set-version
     steps:
       - name: Print FULL_VERSION
-        run: echo "Using FULL_VERSION:${{ needs.set-version.outputs.full_version }}"
+        run: echo "${{ needs.set-version.outputs.full_version }}"
 
 
   print_id:
