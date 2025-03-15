@@ -26,5 +26,5 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Print Workflow ID
-        run: echo  "$BASE_DIR.$SUB_DIR.$RUN_ID.$RUN_ID1
+        run: echo  $BASE_DIR.$SUB_DIR.$RUN_ID.$RUN_ID1
     
