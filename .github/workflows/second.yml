@@ -21,10 +21,12 @@ jobs:
     environment: staging
     steps:
       - name: Print Workflow ID
-        run: echo  ${{ github.run_id }}
+        run: |
+          echo  ${{ github.run_id }}
+          echo "FULL=$BASE_DIR.$SUB_DIR.$RUN_ID.$RUN_ID" >> $GITHUB_ENV
   print_id3:
     runs-on: ubuntu-latest
     steps:
       - name: Print Workflow ID
-        run: echo  $BASE_DIR.$SUB_DIR.$RUN_ID.$RUN_ID1
+        run: echo  $FULL
     
