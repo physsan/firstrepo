@@ -25,5 +25,5 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Print Workflow ID
-        run: echo  $BASE_DIR.$SUB_DIR.$RUN_ID
+        run: echo  "$BASE_DIR.$SUB_DIR.{{ github.run_id }}"
     
